@@ -1,0 +1,30 @@
+# Node modules
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Next.js build
+frontend/.next/
+.next/
+
+# Logs
+*.log
+
+# Env
+.env
+backend/.env
+frontend/.env
+
+# Python
+venv/
+__pycache__/
+
+# VSCode
+.vscode/
+
+# Uploads (optional, if you don’t want image uploads on GitHub)
+backend/uploads/
+
+# System
+.DS_Store
+Thumbs.db
