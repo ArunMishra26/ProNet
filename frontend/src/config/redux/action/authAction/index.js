@@ -81,9 +81,11 @@ export const sendConnectionRequest = createAsyncThunk(
     async(user,thunkAPI) => {
         try{
             const response = await clientServer.post("/user/send_connection_request",{
-                token: user.token,
+                token: localStorage.getItem("token"),
                 connectionId: user.connectionId
-            })
+            });
+            
+            thunkAPI.dispatch(getMyConnectionRequests({token: user.token}))
             return thunkAPI.fulfillWithValue(response.data);
         } catch(error){
             return thunkAPI.rejectWithValue(error.response.data.message)
@@ -93,7 +95,7 @@ export const sendConnectionRequest = createAsyncThunk(
 )
 
 export const getConnectionsRequest = createAsyncThunk(
-    "user/getConnectionRequest",
+    "user/getConnectionRequests",
     async(user,thunkAPI) => {
         try{
             const response = await clientServer.get("/user/getConnectionRequests",{
@@ -120,7 +122,7 @@ export const getMyConnectionRequests = createAsyncThunk(
                     token: user.token
                 }
             });
-            return thunkAPI.fulfillWithValue(response.data.connections);
+            return thunkAPI.fulfillWithValue(response.data);
         } catch(error){
             return thunkAPI.rejectWithValue(error.response.data.message);
         }
@@ -128,19 +130,27 @@ export const getMyConnectionRequests = createAsyncThunk(
 )
 
 export const AcceptConnection = createAsyncThunk(
-    "user/acceptConnection",
-    async(user,thunkAPI) => {
-        try{
-            const response = await clientServer.post("/user/accept_connection_request",{
-                token: user.token,
-                connection_id: user.connectionId,
-                action_type: user.action
-            });
-            return thunkAPI.fulfillWithValue(response.data);
-
-        } catch(error){
-            return thunkAPI.rejectWithValue(error.response.data.message);
-
+  "user/acceptConnection",
+  async (data, thunkAPI) => {
+    try {
+      const response = await clientServer.post(
+        "/user/accept_connection_request",
+        {
+          token: data.token,
+          requestId: data.requestId, // ✅ FIXED
+          action_type: data.action_type,
         }
+      );
+
+      // 🔥 Refresh connections
+      thunkAPI.dispatch(
+        getMyConnectionRequests({ token: data.token })
+      );
+
+      return thunkAPI.fulfillWithValue(response.data);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
     }
-)
+  }
+);
+
