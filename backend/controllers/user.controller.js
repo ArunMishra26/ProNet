@@ -148,7 +148,7 @@ export const getUserAndProfile = async (req, res) => {
     }
     const userProfile = await Profile.findOne({ userId: user._id }).populate(
       "userId",
-      "name email username profilePicture"
+      "name email username profilePicture coverPicture"
     );
 
     return res.json(userProfile);
@@ -382,3 +382,29 @@ export const getUserProfileAndUserBasedOnUsername = async(req,res) => {
 
   }
 }
+
+
+export const uploadCoverPicture = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No cover image uploaded" });
+    }
+
+    const user = await User.findOne({ token });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.coverPicture = req.file.path;
+    await user.save();
+
+    return res.json({
+      message: "Cover Picture Updated",
+      coverPicture: user.coverPicture
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};

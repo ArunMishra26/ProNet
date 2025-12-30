@@ -54,7 +54,7 @@ export default function Dashboard() {
               <div className={styles.createPostContainer}>
                 <img
                   className={styles.userProfile}
-                  src={`${BASE_URL}/${authState.user.profilePicture}`}
+                  src={`${BASE_URL}/${authState.user.userId.profilePicture}`}
                   alt=""
                 />
                 <textarea

@@ -137,20 +137,27 @@ export const AcceptConnection = createAsyncThunk(
         "/user/accept_connection_request",
         {
           token: data.token,
-          requestId: data.requestId, // ✅ FIXED
+          requestId: data.requestId,
           action_type: data.action_type,
         }
       );
 
-      // 🔥 Refresh connections
-      thunkAPI.dispatch(
-        getMyConnectionRequests({ token: data.token })
-      );
+      // 🔥 Fetch updated connections from server
+      const updatedConnections = await clientServer.get("/user/getConnectionRequests", {
+        params: { token: data.token },
+      });
+
+      // ✅ Directly update connections in Redux
+      thunkAPI.dispatch({
+        type: "auth/updateConnectionsAfterAccept",
+        payload: updatedConnections.data.connections,
+      });
 
       return thunkAPI.fulfillWithValue(response.data);
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.message);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
+
 

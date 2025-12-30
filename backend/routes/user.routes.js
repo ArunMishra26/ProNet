@@ -5,6 +5,7 @@ import multer from 'multer';
 import { uploadProfilePicture } from "../controllers/user.controller.js";
 import { updateUserProfile } from "../controllers/user.controller.js";
 import { getUserProfileAndUserBasedOnUsername } from "../controllers/user.controller.js";
+import { uploadCoverPicture } from "../controllers/user.controller.js";
 
 const router = Router();
 
@@ -36,5 +37,7 @@ router.route("/user/getConnectionRequests").get(getMyConnectionsRequests);
 router.route("/user/user_connection_request").get(whatAreMyConnections);
 router.route("/user/accept_connection_request").post(acceptConnectionRequest);
 router.route("/user/get_profile_based_on_username").get(getUserProfileAndUserBasedOnUsername);
+router.route("/update_cover_picture")
+  .post(upload.single("cover_picture"), uploadCoverPicture);
 
 export default router;

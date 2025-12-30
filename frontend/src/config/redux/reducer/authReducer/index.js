@@ -3,6 +3,7 @@ import {
   getMyConnectionRequests,
   loginUser,
   registerUser,
+  AcceptConnection
 } from "../../action/authAction";
 import { createSlice } from "@reduxjs/toolkit";
 import { getAboutUser } from "../../action/authAction";
@@ -39,6 +40,9 @@ const authSlice = createSlice({
     },
     setTokenIsNotThere: (state) => {
       state.isTokenThere = false;
+    },
+    updateConnectionsAfterAccept: (state, action) => {
+      state.connections = Array.isArray(action.payload) ? action.payload : [];
     },
   },
   extraReducers: (builder) => {
@@ -100,11 +104,30 @@ const authSlice = createSlice({
       })
       .addCase(getMyConnectionRequests.rejected, (state, action) => {
         state.message = action.payload;
+      })
+      .addCase(AcceptConnection.fulfilled, (state, action) => {
+        state.message = "Connection Accepted Successfully";
+
+        // 🔥 Update connections immediately
+        if (action.meta?.arg?.token) {
+          state.connections = state.connections.map((conn) => {
+            if (
+              conn._id === action.meta.arg.requestId &&
+              conn.connectionId?._id === state.user?.userId?._id
+            ) {
+              return { ...conn, status_accepted: true };
+            }
+            return conn;
+          });
+        }
+      })
+      .addCase(AcceptConnection.rejected, (state, action) => {
+        state.message = action.payload;
       });
   },
 });
 
-export const { reset, emptyMessage, setTokenIsThere, setTokenIsNotThere } =
+export const { reset, emptyMessage, setTokenIsThere, setTokenIsNotThere, updateConnectionsAfterAccept } =
   authSlice.actions;
 
 export default authSlice.reducer;

@@ -30,7 +30,12 @@ const UserSchema = new mongoose.Schema({
     token:{
         type:String,
         default:''
+    },
+    coverPicture: {
+    type: String,
+    default: ""
     }
+
 });
 
 const User = mongoose.model("User",UserSchema);

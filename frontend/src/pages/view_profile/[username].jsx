@@ -12,7 +12,9 @@ import {
   getConnectionsRequest,
   getMyConnectionRequests,
   sendConnectionRequest,
+  AcceptConnection
 } from "@/config/redux/action/authAction";
+
 
 export default function ViewProfilePage({ userProfile }) {
   const router = useRouter();
@@ -22,12 +24,15 @@ export default function ViewProfilePage({ userProfile }) {
   const authState = useSelector((state) => state.auth);
 
   const [userPosts, setUserPosts] = useState([]);
-  const [isConnected, setIsConnected] = useState(false);
-  const [isPending, setIsPending] = useState(false);
   const [selfProfile, setSelfProfile] = useState(false);
+  const [coverUrl, setCoverUrl] = useState("");
+  const [profileUrl, setProfileUrl] = useState("");
 
-  const myId = authState.user?._id;
+  const myId = authState.user?.userId?._id;
   const profileId = userProfile?.userId?._id;
+
+  // --- Redux connections will determine Pending/Connected ---
+  const [status, setStatus] = useState("connect"); // connect, pending, connected
 
   // Fetch posts and connections
   useEffect(() => {
@@ -39,78 +44,96 @@ export default function ViewProfilePage({ userProfile }) {
   // Filter posts of this profile
   useEffect(() => {
     if (!posts) return;
-    const filtered = posts.filter(
-      (p) => p.userId?.username === router.query.username
-    );
+    const filtered = posts.filter((p) => p.userId?._id === profileId);
     setUserPosts(filtered);
-  }, [posts, router.query.username]);
+  }, [posts, profileId]);
 
-  // Determine self-profile and connection status
+  // Update cover & profile picture (cache-busting)
   useEffect(() => {
-    if (!myId || !profileId) return;
+    if (!userProfile) return;
+    const timestamp = new Date().getTime();
+    setCoverUrl(
+      userProfile.userId.coverPicture
+        ? `${BASE_URL}/${userProfile.userId.coverPicture.replace(/^uploads[\\/]/, "")}?t=${timestamp}`
+        : "https://images.pexels.com/photos/545521/pexels-photo-545521.jpeg"
+    );
+    setProfileUrl(
+      userProfile.userId.profilePicture
+        ? `${BASE_URL}/${userProfile.userId.profilePicture}?t=${timestamp}`
+        : ""
+    );
+  }, [userProfile]);
+  useEffect(() => {
+  updateStatus();
+}, [authState.connections, myId, profileId]);
 
-    let pending = false;
-    let connected = false;
+
+  // --- Calculate connection status from Redux state ---
+  const updateStatus = () => {
+    if (!authState.connections || !myId || !profileId) return;
 
     if (myId.toString() === profileId.toString()) {
-      // Self-profile: show as connected
-      connected = true;
-      pending = false;
+      setStatus("connected");
       setSelfProfile(true);
+      return;
     } else {
       setSelfProfile(false);
-
-      if (authState.connections) {
-        authState.connections.forEach((c) => {
-          const isBetween =
-            (c.userId?._id.toString() === myId.toString() &&
-             c.connectionId?._id.toString() === profileId.toString()) ||
-            (c.userId?._id.toString() === profileId.toString() &&
-             c.connectionId?._id.toString() === myId.toString());
-
-          if (isBetween) {
-            if (c.status_accepted === true) {
-              connected = true;
-            } else if (c.status_accepted === null) {
-              if (c.userId?._id.toString() === myId.toString()) {
-                pending = true;
-              }
-            }
-          }
-        });
-      }
     }
 
-    setIsPending(pending);
-    setIsConnected(connected);
+    let newStatus = "connect"; // default
+    authState.connections.forEach((c) => {
+      const isBetween =
+        (c.userId?._id.toString() === myId.toString() && c.connectionId?._id.toString() === profileId.toString()) ||
+        (c.userId?._id.toString() === profileId.toString() && c.connectionId?._id.toString() === myId.toString());
+
+      if (isBetween) {
+        if (c.status_accepted === true) newStatus = "connected";
+        else if (c.status_accepted === null && c.userId?._id.toString() === myId.toString()) newStatus = "pending";
+      }
+    });
+
+    setStatus(newStatus);
+  };
+
+  // Listen to Redux connections changes for real-time update
+  useEffect(() => {
+    updateStatus();
   }, [authState.connections, myId, profileId]);
 
-  // Send connection request
+  // --- Connect button click ---
   const handleConnect = async () => {
     if (!profileId) return;
-
+    setStatus("pending"); // instant pending
     await dispatch(
-      sendConnectionRequest({
-        token: localStorage.getItem("token"),
-        connectionId: profileId,
-      })
+      sendConnectionRequest({ token: localStorage.getItem("token"), connectionId: profileId })
     );
-
-    setIsPending(true);
-
-    // Refresh connections after sending request
+    // Fetch updated connections
     dispatch(getMyConnectionRequests({ token: localStorage.getItem("token") }));
     dispatch(getConnectionsRequest({ token: localStorage.getItem("token") }));
+  };
+
+  // --- Accept connection (for demonstration, can call this in accept button) ---
+  const handleAccept = async (connectionId) => {
+    await dispatch(
+      acceptConnectionRequest({ token: localStorage.getItem("token"), connectionId })
+    );
+    // Redux connections updated → useEffect will trigger → status updated
+    dispatch(getConnectionsRequest({ token: localStorage.getItem("token") }));
+    dispatch(getMyConnectionRequests({ token: localStorage.getItem("token") }));
   };
 
   return (
     <UserLayout>
       <DashboardLayout>
         <div className={styles.container}>
+          {/* COVER IMAGE */}
           <div className={styles.coverWrapper}>
-            <div className={styles.cover}></div>
+            <div
+              className={styles.cover}
+              style={{ backgroundImage: `url(${coverUrl})` }}
+            ></div>
             <img
-              src={`${BASE_URL}/${userProfile.userId.profilePicture}`}
+              src={profileUrl}
               alt="profile"
               className={styles.profilePic}
             />
@@ -127,12 +150,11 @@ export default function ViewProfilePage({ userProfile }) {
               {/* ACTIONS */}
               <div className={styles.actionRow}>
                 <div style={{ display: "flex", alignItems: "center", gap: "1.2rem" }}>
-                  {/* Show button always; self-profile shows Connected */}
-                  {(selfProfile || !selfProfile) && (
+                  {!selfProfile && (
                     <>
-                      {isConnected ? (
+                      {status === "connected" ? (
                         <button className={styles.connectedBtn}>Connected</button>
-                      ) : isPending ? (
+                      ) : status === "pending" ? (
                         <button className={styles.pendingBtn}>Pending</button>
                       ) : (
                         <button
@@ -213,6 +235,7 @@ export default function ViewProfilePage({ userProfile }) {
   );
 }
 
+// Server side fetch
 export async function getServerSideProps(context) {
   const res = await clientServer.get("/user/get_profile_based_on_username", {
     params: { username: context.query.username },

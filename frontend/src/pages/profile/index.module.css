@@ -1,125 +1,149 @@
-.container {
-  width: 100%;
-  font-family: Arial, sans-serif;
-}
-
-/* COVER */
-.coverWrapper {
-  position: relative;
-  width: 100%;
-  height: 220px;
-}
-
 .cover {
-  width: 100%;
-  height: 160px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 10px;
+  height: 280px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  background: url("https://images.pexels.com/photos/545521/pexels-photo-545521.jpeg");
 }
 
-/* PROFILE IMAGE */
-.profileImageWrapper {
+.coverBtn {
   position: absolute;
-  left: 40px;
-  bottom: -50px;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
+  bottom: 20px;
+  right: 30px;
+  background: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: 600;
   cursor: pointer;
-  z-index: 10;
-  overflow: hidden;
-  transition: transform 0.3s ease;
 }
 
-.profileImageWrapper:hover {
-  transform: scale(1.05);
+.main {
+  display: flex;
+  gap: 25px;
+  margin-top: -70px;
+  padding: 0 30px;
+}
+
+.leftCard {
+  width: 40%;
+  background: white;
+  border-radius: 16px;
+  padding: 2px;
+}
+
+.rightCard {
+  width: 60%;
+  background: white;
+  border-radius: 16px;
+  padding: 75px;
 }
 
 .profilePic {
-  width: 100%;
-  height: 100%;
+  width: 130px;
+  height: 130px;
+  margin: auto;
   border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #fff;
-  z-index: 5;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  border: 4px solid white;
 }
 
-/* HOVER OVERLAY */
-.editOverlay {
+.profilePic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profilePic span {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 20;
+  transition: .3s;
 }
 
-.profileImageWrapper:hover .editOverlay {
+.profilePic:hover span {
   opacity: 1;
 }
 
-/* INFO SECTION */
-.infoSection {
-  margin-top: 80px;
-  padding-left: 40px;
-}
-
-.username {
-  color: gray;
-  margin-top: 4px;
-}
-
 .bio {
+  color: #444;
+  margin-bottom: 15px;
+}
+
+.input {
+  width: 100%;
   margin-top: 10px;
-  max-width: 500px;
-  line-height: 1.6;
-}
-
-/* WORK HISTORY */
-.workHistory {
-  margin-top: 20px;
-}
-
-.workHistory h3 {
-  margin-bottom: 8px;
-}
-
-.workItem {
-  background: #f9f9f9;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-}
-
-/* RECENT ACTIVITY */
-.recentActivity {
-  margin-top: 20px;
-}
-
-.recentActivity h3 {
-  margin-bottom: 8px;
-}
-
-.activityItem {
-  background: #f1f1f1;
-  padding: 8px 12px;
-  margin-bottom: 6px;
+  padding: 9px;
   border-radius: 8px;
-  font-size: 14px;
+  border: 1px solid #ddd;
 }
 
-.loading {
-  text-align: center;
-  margin-top: 2rem;
+.textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  min-height: 80px;
+}
+
+.work {
+  margin-top: 12px;
+  padding: 10px;
+  background: #f7f7f7;
+  border-radius: 10px;
+}
+
+.addBtn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #e3f2fd;
+  color: #0a66c2;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editBtn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  background: #0a66c2;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.activity {
+  background: #f4f6f8;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.activity img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.removeBtn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #ff4d4f;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
 }
