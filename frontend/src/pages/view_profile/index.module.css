@@ -3,14 +3,13 @@
   background: #faf8f8;
 }
 
-/* COVER */
+
 .coverWrapper {
   position: relative;
   height: 32vh;
   border-radius: 20px;
 }
 
-/* IMPORTANT: no overflow hidden */
 .cover {
   width: 100%;
   height: 100%;
@@ -32,7 +31,6 @@
   background: white;
 }
 
-/* GRID */
 .contentGrid {
   display: grid;
   grid-template-columns: 3fr 1.2fr;
@@ -75,7 +73,6 @@
   margin-top: 1rem;
 }
 
-/* WORK */
 .workHistory {
   margin-top: 2rem;
 }
@@ -92,7 +89,7 @@
   box-shadow: 8px 8px 15px rgb(180, 180, 180);
 }
 
-/* RIGHT */
+
 .rightSection {
   background: white;
   padding: 1.2rem;
@@ -116,4 +113,83 @@
 .noPost {
   color: gray;
   margin-top: 1rem;
+}
+
+@media only screen and (max-width: 600px){
+  .container {
+    padding: 1rem;
+  }
+
+  /* COVER */
+  .coverWrapper {
+    height: 22vh;
+  }
+
+  /* PROFILE PIC CENTERED */
+  .profilePic {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -3.8rem;
+    width: 7.5rem;
+    height: 7.5rem;
+  }
+
+  /* GRID → SINGLE COLUMN */
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 5rem;
+  }
+
+  /* NAME ROW STACK */
+  .nameRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+
+  /* ACTION BUTTONS STACK */
+  .actionRow > div {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .connectBtn,
+  .connectedBtn,
+  .pendingBtn {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  /* BIO */
+  .bio {
+    font-size: 0.9rem;
+  }
+
+  /* WORK HISTORY → HORIZONTAL SCROLL */
+  .workHistoryContainer {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.5rem;
+  }
+
+  .workCard {
+    min-width: 220px;
+    flex-shrink: 0;
+    padding: 1rem;
+  }
+
+  /* RIGHT SECTION */
+  .rightSection {
+    padding: 1rem;
+  }
+
+  .postCard {
+    gap: 0.6rem;
+  }
+
+  .postImg {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
 }
